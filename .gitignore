@@ -1,0 +1,19 @@
+# 虚拟环境
+.venv/
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE 配置（PyCharm）
+.idea/
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+
+# 打包后的游戏（如果以后生成）
+dist/
+build/
+*.exe
