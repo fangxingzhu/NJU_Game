@@ -1,14 +1,60 @@
 import pygame
-from src.config import Scene
+from src.config import Scene,TILE_SIZE,MAP_COLS,MAP_ROWS
+from src.map import GameMap
+from src.player import Player
+from src.building import BuildingManager
+from src.ui import draw_prompt
 
 
 class Overworld:
+    def __init__(self):
+        self.map = GameMap("data/map.json")
+        # 玩家初始位置：道路区域，例如第1列第1行的格子左上角（32,32）
+        self.player = Player(TILE_SIZE, TILE_SIZE)
+        self.building_manager = BuildingManager(self.map)
+        self.nearby_building = None
+
     def update(self, events):
+        # 处理连续按键（移动）
+        keys = pygame.key.get_pressed()
+        dx, dy = 0, 0
+        if keys[pygame.K_LEFT]:
+            dx = -self.player.speed
+        if keys[pygame.K_RIGHT]:
+            dx = self.player.speed
+        if keys[pygame.K_UP]:
+            dy = -self.player.speed
+        if keys[pygame.K_DOWN]:
+            dy = self.player.speed
+        self.player.move(dx, dy, self.map)
+        player_rect = pygame.Rect(self.player.x, self.player.y,
+                                  self.player.width, self.player.height)
+        self.nearby_building = self.building_manager.check_nearby(player_rect)
+
+        # 处理事件（切换场景）
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    return Scene.START  # 按 ESC 回到开始画面
+                    return Scene.START
+                if event.key == pygame.K_e and self.nearby_building:
+                    return Scene.BUILDING
         return None
 
     def draw(self, screen):
-        screen.fill((50, 50, 50))  # 深灰色背景，之后换成地图绘制
+        # 计算摄像机偏移，让玩家始终保持在屏幕中央
+        camera_x = self.player.x - (screen.get_width() // 2) + (self.player.width // 2)
+        camera_y = self.player.y - (screen.get_height() // 2) + (self.player.height // 2)
+
+        # 限制摄像机不超出地图边界
+        max_camera_x = MAP_COLS * TILE_SIZE - screen.get_width()
+        max_camera_y = MAP_ROWS * TILE_SIZE - screen.get_height()
+        camera_x = max(0, min(camera_x, max_camera_x))
+        camera_y = max(0, min(camera_y, max_camera_y))
+
+        self.map.draw(screen, camera_x, camera_y)
+        self.player.draw(screen, camera_x, camera_y)
+        if self.nearby_building:
+            prompt = f"按 E 进入{self.nearby_building['name']}"
+        else:
+            prompt = ""
+        draw_prompt(screen, prompt)
