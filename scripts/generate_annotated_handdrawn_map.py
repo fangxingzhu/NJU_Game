@@ -34,6 +34,7 @@ MANUAL_CLEAR_PATHS = [
 INTERACTIVE_BUILDINGS = {
     "大礼堂",
     "北大楼",
+    "教学楼",
 }
 
 
