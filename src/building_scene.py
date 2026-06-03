@@ -1,5 +1,5 @@
 import pygame
-from src.config import Scene, font1_path, font2_path
+from src.config import Scene, font1_path
 from src.dialog import DialogEngine
 from src.ui import draw_dialog_box
 
@@ -7,6 +7,7 @@ class BuildingScene:
     def __init__(self):
         self.building_data = None
         self.dialog_engine = None
+        self.name_font = pygame.font.Font(font1_path, 36)
 
     def enter(self, building_data):
         self.building_data = building_data
@@ -31,8 +32,7 @@ class BuildingScene:
         screen.fill((20, 20, 60))  # 内部背景
         if self.building_data:
             # 显示建筑名称（上方标题）
-            name_font = pygame.font.Font(font1_path, 36)
-            name_surf = name_font.render(self.building_data['name'], True, (255,255,255))
+            name_surf = self.name_font.render(self.building_data['name'], True, (255,255,255))
             name_x = (screen.get_width() - name_surf.get_width()) // 2
             screen.blit(name_surf, (name_x, 100))
 

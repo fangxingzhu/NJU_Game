@@ -6,8 +6,8 @@ class Player:
     def __init__(self, x, y):
         self.x = x  # 像素坐标（左上角）
         self.y = y
-        self.width = TILE_SIZE
-        self.height = TILE_SIZE
+        self.width = 18
+        self.height = 22
         self.speed = PLAYER_SPEED
         self.direction = "down"  # 朝向（以后可用于动画）
 
@@ -15,6 +15,22 @@ class Player:
         """尝试移动，dx、dy 为像素偏移量。game_map 用于碰撞检测"""
         new_x = self.x + dx
         new_y = self.y + dy
+
+        if hasattr(game_map, 'is_rect_walkable'):
+            new_rect = pygame.Rect(new_x, new_y, self.width, self.height)
+            if not game_map.is_rect_walkable(new_rect):
+                return
+            self.x = new_x
+            self.y = new_y
+            if dx > 0:
+                self.direction = "right"
+            elif dx < 0:
+                self.direction = "left"
+            elif dy > 0:
+                self.direction = "down"
+            elif dy < 0:
+                self.direction = "up"
+            return
 
         # 检测新位置的四个角是否都在可行走区域
         corners = [
@@ -44,8 +60,12 @@ class Player:
         elif dy < 0:
             self.direction = "up"
 
-    def draw(self, screen, camera_x=0, camera_y=0):
+    def draw(self, screen, camera_x=0, camera_y=0, scale=1.0):
         """绘制玩家，camera_x/y 为摄像机偏移"""
-        draw_x = self.x - camera_x
-        draw_y = self.y - camera_y
-        pygame.draw.rect(screen, COLOR_PLAYER, (draw_x, draw_y, self.width, self.height))
+        draw_x = (self.x - camera_x) * scale
+        draw_y = (self.y - camera_y) * scale
+        draw_width = max(1, round(self.width * scale))
+        draw_height = max(1, round(self.height * scale))
+        pygame.draw.ellipse(screen, COLOR_PLAYER, (draw_x, draw_y, draw_width, draw_height))
+        head_center = (int(draw_x + draw_width / 2), int(draw_y + 5 * scale))
+        pygame.draw.circle(screen, (40, 40, 160), head_center, max(1, round(5 * scale)))

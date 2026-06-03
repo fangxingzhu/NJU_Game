@@ -1,5 +1,5 @@
 import pygame
-from src.config import Scene,TILE_SIZE,MAP_COLS,MAP_ROWS
+from src.config import Scene,TILE_SIZE,MAP_COLS,MAP_ROWS,MAP_DISPLAY_SCALE
 from src.map import GameMap
 from src.player import Player
 from src.building import BuildingManager
@@ -10,7 +10,10 @@ class Overworld:
     def __init__(self):
         self.map = GameMap("data/map.json")
         # 玩家初始位置：道路区域，例如第1列第1行的格子左上角（32,32）
-        self.player = Player(TILE_SIZE, TILE_SIZE)
+        if self.map.player_start:
+            self.player = Player(self.map.player_start[0], self.map.player_start[1])
+        else:
+            self.player = Player(TILE_SIZE, TILE_SIZE)
         self.building_manager = BuildingManager(self.map)
         self.nearby_building = None
 
@@ -41,18 +44,22 @@ class Overworld:
         return None
 
     def draw(self, screen):
+        scale = MAP_DISPLAY_SCALE
+        visible_width = screen.get_width() / scale
+        visible_height = screen.get_height() / scale
+
         # 计算摄像机偏移，让玩家始终保持在屏幕中央
-        camera_x = self.player.x - (screen.get_width() // 2) + (self.player.width // 2)
-        camera_y = self.player.y - (screen.get_height() // 2) + (self.player.height // 2)
+        camera_x = self.player.x - (visible_width / 2) + (self.player.width / 2)
+        camera_y = self.player.y - (visible_height / 2) + (self.player.height / 2)
 
         # 限制摄像机不超出地图边界
-        max_camera_x = MAP_COLS * TILE_SIZE - screen.get_width()
-        max_camera_y = MAP_ROWS * TILE_SIZE - screen.get_height()
+        max_camera_x = self.map.width - visible_width
+        max_camera_y = self.map.height - visible_height
         camera_x = max(0, min(camera_x, max_camera_x))
         camera_y = max(0, min(camera_y, max_camera_y))
 
-        self.map.draw(screen, camera_x, camera_y)
-        self.player.draw(screen, camera_x, camera_y)
+        self.map.draw(screen, camera_x, camera_y, scale)
+        self.player.draw(screen, camera_x, camera_y, scale)
         if self.nearby_building:
             prompt = f"按 E 进入{self.nearby_building['name']}"
         else:
