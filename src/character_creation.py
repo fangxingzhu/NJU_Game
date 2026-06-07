@@ -1,6 +1,8 @@
-import pygame
 import os
+import platform
 import subprocess
+
+import pygame
 
 from src.config import Scene
 from src.player_data import PlayerData
@@ -57,6 +59,29 @@ class CharacterCreationScene:
         return bool(self.name.strip()) and self.name_length(self.name) <= 16
 
     def open_name_dialog(self):
+        system = platform.system()
+        if system == "Windows":
+            value = self.open_windows_name_dialog()
+        elif system == "Darwin":
+            value = self.open_macos_name_dialog()
+        else:
+            value = self.open_tk_name_dialog()
+
+        if value is None:
+            return
+
+        value = value.strip()
+        if not value:
+            return
+
+        if self.name_length(value) > 16:
+            self.name_error = "姓名最多 8 个中文或 16 个英文字符"
+            return
+
+        self.name = value
+        self.name_error = ""
+
+    def open_windows_name_dialog(self):
         command = (
             "Add-Type -AssemblyName Microsoft.VisualBasic; "
             "[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; "
@@ -79,22 +104,53 @@ class CharacterCreationScene:
             )
         except (OSError, subprocess.SubprocessError):
             self.name_error = "无法打开姓名输入窗口"
-            return
+            return None
 
         if result.returncode != 0:
             self.name_error = "姓名输入窗口返回错误"
-            return
+            return None
+        return result.stdout
 
-        value = result.stdout.strip()
-        if not value:
-            return
+    def open_macos_name_dialog(self):
+        initial_name = self.escape_applescript_text(self.name)
+        script = (
+            'text returned of (display dialog "请输入姓名：" '
+            f'default answer "{initial_name}" '
+            'with title "输入姓名" buttons {"取消", "确认"} default button "确认")'
+        )
 
-        if self.name_length(value) > 16:
-            self.name_error = "姓名最多 8 个中文或 16 个英文字符"
-            return
+        try:
+            result = subprocess.run(
+                ["osascript", "-e", script],
+                capture_output=True,
+                text=True,
+                encoding="utf-8"
+            )
+        except (OSError, subprocess.SubprocessError):
+            self.name_error = "无法打开 macOS 姓名输入窗口"
+            return None
 
-        self.name = value
-        self.name_error = ""
+        if result.returncode != 0:
+            return None
+        return result.stdout
+
+    def escape_applescript_text(self, text):
+        return text.replace("\\", "\\\\").replace('"', '\\"')
+
+    def open_tk_name_dialog(self):
+        try:
+            import tkinter as tk
+            from tkinter import simpledialog
+        except ImportError:
+            self.name_error = "当前系统缺少姓名输入窗口支持"
+            return None
+
+        root = tk.Tk()
+        root.withdraw()
+        try:
+            return simpledialog.askstring("输入姓名", "请输入姓名：", initialvalue=self.name, parent=root)
+        finally:
+            root.destroy()
 
     def draw(self, screen):
         self.draw_portrait_background(screen)

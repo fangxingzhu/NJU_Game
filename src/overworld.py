@@ -3,7 +3,7 @@ from src.config import Scene,TILE_SIZE,MAP_COLS,MAP_ROWS
 from src.map import GameMap
 from src.player import Player
 from src.building import BuildingManager
-from src.ui import draw_prompt
+from src.ui import draw_prompt, get_ui_font
 
 
 class Overworld:
@@ -70,3 +70,11 @@ class Overworld:
         else:
             prompt = ""
         draw_prompt(screen, prompt)
+        self.draw_menu_hint(screen)
+
+    def draw_menu_hint(self, screen):
+        text_surf = get_ui_font(16).render("按 ESC 打开菜单", True, (60, 60, 60))
+        padding = 10
+        x = screen.get_width() - text_surf.get_width() - padding
+        y = screen.get_height() - text_surf.get_height() - padding
+        screen.blit(text_surf, (x, y))
