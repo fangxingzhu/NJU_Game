@@ -11,8 +11,16 @@ class Overworld:
         self.map = GameMap("data/map.json")
         # 玩家初始位置：道路区域，例如第1列第1行的格子左上角（32,32）
         self.player = Player(TILE_SIZE, TILE_SIZE)
+        self.player_data = None
         self.building_manager = BuildingManager(self.map)
         self.nearby_building = None
+
+    def enter(self, player_data=None):
+        self.player_data = player_data
+        if player_data:
+            self.player.x = player_data.x
+            self.player.y = player_data.y
+            self.player.direction = player_data.direction
 
     def update(self, events):
         # 处理连续按键（移动）
@@ -27,6 +35,10 @@ class Overworld:
         if keys[pygame.K_DOWN]:
             dy = self.player.speed
         self.player.move(dx, dy, self.map)
+        if self.player_data:
+            self.player_data.x = self.player.x
+            self.player_data.y = self.player.y
+            self.player_data.direction = self.player.direction
         player_rect = pygame.Rect(self.player.x, self.player.y,
                                   self.player.width, self.player.height)
         self.nearby_building = self.building_manager.check_nearby(player_rect)
