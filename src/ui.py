@@ -1,10 +1,17 @@
 import pygame
 from src.config import font2_path
 
+_font_cache = {}
+
+def get_ui_font(size):
+    if size not in _font_cache:
+        _font_cache[size] = pygame.font.Font(font2_path, size)
+    return _font_cache[size]
+
 def draw_prompt(screen, text):
     if not text:
         return
-    font = pygame.font.Font(font2_path, 24)
+    font = get_ui_font(24)
     text_surf = font.render(text, True, (255, 255, 255))
     padding = 20
     bg_width = text_surf.get_width() + padding * 2
@@ -25,7 +32,7 @@ def draw_prompt(screen, text):
 def draw_dialog_box(screen, text):
     if not text:
         return
-    font = pygame.font.Font(font2_path, 24)
+    font = get_ui_font(24)
     text_surf = font.render(text, True, (255, 255, 255))
     padding = 20
     box_width = screen.get_width() - 100

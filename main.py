@@ -19,7 +19,9 @@ def main():
                 pygame.quit()
                 sys.exit()
 
-        manager.update(events)
+        if manager.update(events) == "quit":
+            pygame.quit()
+            sys.exit()
         manager.draw(screen)
         pygame.display.flip()
 
