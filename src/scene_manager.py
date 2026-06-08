@@ -8,6 +8,7 @@ from src.overworld import Overworld
 from src.building_scene import BuildingScene
 from src.save_manager import SaveManager
 from src.game_menu import GameMenu
+from src.time_system import TimeSystem
 
 
 class SceneManager:
@@ -19,6 +20,7 @@ class SceneManager:
         self.save_manager = SaveManager()
         self.menu = GameMenu()
         self.menu_open = False
+        self.time_system = TimeSystem()
         self.scenes = {
             Scene.START: StartScreen(),
             Scene.SAVE_SELECT: SaveSelectScene(self.save_manager),
@@ -26,12 +28,15 @@ class SceneManager:
             Scene.OVERWORLD: Overworld(),
             Scene.BUILDING: BuildingScene()
         }
+        
 
     def switch_to(self, scene_name):
         if scene_name in self.scenes:
             self.current_scene = scene_name
 
     def update(self, events):
+        if self.current_scene in (Scene.OVERWORLD, Scene.BUILDING) and not self.menu_open:
+            self.time_system.update()
         if self.menu_open:
             return self.update_menu(events)
 
@@ -88,10 +93,10 @@ class SceneManager:
                 self.player_data = self.scenes[Scene.CHARACTER_CREATE].created_player_data
                 self.current_slot = self.pending_new_slot
                 self.pending_new_slot = None
-                self.scenes[Scene.OVERWORLD].enter(self.player_data)
+                self.scenes[Scene.OVERWORLD].enter(self.player_data, self.time_system)
                 self.save_current_game()
             else:
-                self.scenes[Scene.OVERWORLD].enter(self.player_data)
+                self.scenes[Scene.OVERWORLD].enter(self.player_data, self.time_system)
 
         if next_scene == Scene.BUILDING and self.current_scene == Scene.OVERWORLD:
             nearby = self.scenes[Scene.OVERWORLD].nearby_building
@@ -113,7 +118,7 @@ class SceneManager:
         save_data = self.save_manager.load(slot)
         self.current_slot = slot
         self.player_data = self.save_manager.player_from_save(save_data)
-        self.scenes[Scene.OVERWORLD].enter(self.player_data)
+        self.scenes[Scene.OVERWORLD].enter(self.player_data, self.time_system)
 
         if save_data.get("scene") == Scene.BUILDING and save_data.get("current_building"):
             building = self.find_building(save_data.get("current_building"))
