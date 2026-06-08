@@ -23,7 +23,8 @@ PLAYER_SPEED = 2
 # 场景名称统一标识
 class Scene:
     START = "start" #开始游戏页面
-    SELECT = "select"
+    SAVE_SELECT = "save_select"
+    CHARACTER_CREATE = "character_create"
     OVERWORLD = "overworld" #大地图页面
     BUILDING = "building" #建筑物页面
 
