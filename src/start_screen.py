@@ -10,9 +10,10 @@ class StartScreen:
 
     def update(self, events):
         for event in events:
-            if event.type in (pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN):
-                return Scene.SAVE_SELECT
-        return None
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    return Scene.SELECT  # 按空格进入大地图
+        return None  # 不切换场景
 
     def draw(self, screen):
         screen.fill((0, 0, 0))
