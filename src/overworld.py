@@ -21,6 +21,8 @@ class Overworld:
             self.player.x = player_data.x
             self.player.y = player_data.y
             self.player.direction = player_data.direction
+            self.player.set_gender(player_data.gender)
+
 
     def update(self, events):
         # 处理连续按键（移动）
