@@ -16,8 +16,8 @@ class Player:
         self.x = x
         self.y = y
 
-        self.width = TILE_SIZE
-        self.height = TILE_SIZE
+        self.width = TILE_SIZE-8
+        self.height = TILE_SIZE-8
         self.speed = PLAYER_SPEED
 
         self.direction = "down"
@@ -79,45 +79,64 @@ class Player:
         return animations
 
     def move(self, dx, dy, game_map):
-        new_x = self.x + dx
-        new_y = self.y + dy
+        # 1. 尝试同时移动X和Y
+        if dx == 0 and dy == 0:
+            self.moving = False
+            self.frame_index = 0
+            return
 
-        corners = [
-            (new_x, new_y),
-            (new_x + self.width - 1, new_y),
-            (new_x, new_y + self.height - 1),
-            (new_x + self.width - 1, new_y + self.height - 1),
-        ]
+        # 检测在某个偏移下的碰撞（不考虑方向收缩，保持16x16原始大小）
+        def can_move(offset_x, offset_y):
+            nx = self.x + offset_x
+            ny = self.y + offset_y
+            # 四个角
+            corners = [
+                (nx, ny),
+                (nx + self.width - 1, ny),
+                (nx, ny + self.height - 1),
+                (nx + self.width - 1, ny + self.height - 1)
+            ]
+            for cx, cy in corners:
+                col = int(cx // TILE_SIZE)
+                row = int(cy // TILE_SIZE)
+                if not game_map.is_walkable(col, row):
+                    return False
+            return True
 
-        for cx, cy in corners:
-            col = int(cx // TILE_SIZE)
-            row = int(cy // TILE_SIZE)
+        # 尝试完全移动
+        if can_move(dx, dy):
+            self.x += dx
+            self.y += dy
+            success = True
+        else:
+            # 2. 分别尝试只移动X或只移动Y（滑动）
+            can_x = can_move(dx, 0)
+            can_y = can_move(0, dy)
 
-            if not game_map.is_walkable(col, row):
-                self.moving = False
-                self.frame_index = 0
-                return
+            if can_x:
+                self.x += dx
+            if can_y:
+                self.y += dy
+            success = can_x or can_y
 
-        self.x = new_x
-        self.y = new_y
+        # 更新朝向和动画（仅当有移动）
+        if success and (dx != 0 or dy != 0):
+            self.moving = True
+            if dx > 0:
+                self.direction = "right"
+            elif dx < 0:
+                self.direction = "left"
+            elif dy > 0:
+                self.direction = "down"
+            elif dy < 0:
+                self.direction = "up"
 
-        self.moving = dx != 0 or dy != 0
-
-        if dx > 0:
-            self.direction = "right"
-        elif dx < 0:
-            self.direction = "left"
-        elif dy > 0:
-            self.direction = "down"
-        elif dy < 0:
-            self.direction = "up"
-
-        if self.moving:
             self.anim_timer += 1
             if self.anim_timer >= self.anim_delay:
                 self.anim_timer = 0
                 self.frame_index = (self.frame_index + 1) % 4
         else:
+            self.moving = False
             self.frame_index = 0
             self.anim_timer = 0
 

@@ -7,8 +7,8 @@ from src.config import TILE_SIZE
 class PlayerData:
     name: str
     gender: str
-    x: int = TILE_SIZE
-    y: int = TILE_SIZE
+    x: int = 19*TILE_SIZE
+    y: int = 23*TILE_SIZE
     direction: str = "down"
 
     def to_dict(self):

@@ -46,6 +46,7 @@ class SceneManager:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     self.menu.open()
                     self.menu_open = True
+                    # 不再将 ESC 事件传递给当前场景，避免冲突
                 else:
                     filtered_events.append(event)
             events = filtered_events
@@ -93,6 +94,8 @@ class SceneManager:
                 self.player_data = self.scenes[Scene.CHARACTER_CREATE].created_player_data
                 self.current_slot = self.pending_new_slot
                 self.pending_new_slot = None
+                # 重置时间系统到默认值（新游戏开始）
+                self.time_system = TimeSystem()  # ← 新增这一行
                 self.scenes[Scene.OVERWORLD].enter(self.player_data, self.time_system)
                 self.save_current_game()
             else:
@@ -101,7 +104,8 @@ class SceneManager:
         if next_scene == Scene.BUILDING and self.current_scene == Scene.OVERWORLD:
             nearby = self.scenes[Scene.OVERWORLD].nearby_building
             if nearby:
-                self.scenes[Scene.BUILDING].enter(nearby)
+                is_night = self.time_system.is_night()  # 获取当前日夜状态
+                self.scenes[Scene.BUILDING].enter(nearby, is_night)
 
         self.switch_to(next_scene)
 
@@ -112,21 +116,43 @@ class SceneManager:
         if self.current_scene == Scene.BUILDING:
             building_data = self.scenes[Scene.BUILDING].building_data
             current_building = building_data.get("name") if building_data else None
-        return self.save_manager.save(self.current_slot, self.player_data, self.current_scene, current_building)
+
+        # 获取当前时间状态
+        ts = self.time_system
+        game_time = {
+            "day": ts.day,
+            "hour": ts.hour,
+            "minute": ts.minute
+        }
+
+        return self.save_manager.save(
+            self.current_slot,
+            self.player_data,
+            self.current_scene,
+            current_building,
+            game_time=game_time
+        )
 
     def load_game(self, slot):
         save_data = self.save_manager.load(slot)
         self.current_slot = slot
         self.player_data = self.save_manager.player_from_save(save_data)
+
+        # 恢复游戏时间
+        saved_time = save_data.get("game_time", {})
+        self.time_system.day = saved_time.get("day", 1)
+        self.time_system.hour = saved_time.get("hour", 8)
+        self.time_system.minute = saved_time.get("minute", 0)
+
         self.scenes[Scene.OVERWORLD].enter(self.player_data, self.time_system)
 
         if save_data.get("scene") == Scene.BUILDING and save_data.get("current_building"):
             building = self.find_building(save_data.get("current_building"))
             if building:
-                self.scenes[Scene.BUILDING].enter(building)
+                is_night = self.time_system.is_night()
+                self.scenes[Scene.BUILDING].enter(building, is_night)
                 self.switch_to(Scene.BUILDING)
                 return
-
         self.switch_to(Scene.OVERWORLD)
 
     def find_building(self, building_name):
