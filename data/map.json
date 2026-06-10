@@ -44,15 +44,15 @@
     {
       "name": "游泳馆",
       "rects": [[9,1,2,4]],
-      "inside_bg": "",
-      "inside_night_bg": "",
+      "inside_bg": "assets/images/gym_daytime.png",
+      "inside_night_bg": "assets/images/gym_nighttime.png",
       "dialog": ["好像还在维修，貌似2026年下半年才能开..."]
     },
     {
-      "name": "数学楼",
+      "name": "教学楼",
       "rects": [[18,5,3,3]],
-      "inside_bg": "assets/images/classroom_daytime1.png",
-      "inside_night_bg": "assets/images/classroom_nighttime1.png",
+      "inside_bg": "assets/images/teachingbuliding_daytime.png",
+      "inside_night_bg": "assets/images/teachingbuliding_nighttime.png",
       "dialog": ["来做题了...","来上课了..."]
     },
     {
@@ -63,17 +63,17 @@
       "dialog": ["这里是北大楼，南大的地标建筑"]
     },
     {
-      "name": "气象楼",
+      "name": "新教学楼",
       "rects": [[36,1,3,3]],
-      "inside_bg": "",
-      "inside_night_bg": "",
-      "dialog": ["这里好像是南大的气象楼","咦？南大有气象楼吗？"]
+      "inside_bg": "assets/images/newteaching_daytime.png",
+      "inside_night_bg": "assets/images/newteaching_nighttime.png",
+      "dialog": ["这里是新教学楼，平常有很多同学爱来这里自习","五楼好像还有一个琴房"]
     },
     {
       "name": "逸夫馆",
       "rects": [[14,8,3,5],[13,10,1,3]],
-      "inside_bg": "",
-      "inside_night_bg": "",
+      "inside_bg": "assets/images/if_daytime.png",
+      "inside_night_bg": "assets/images/if_nighttime.png",
       "dialog": ["这里是逸夫馆","是除了教学楼以外主要的上课地点"]
     },
     {
@@ -84,18 +84,18 @@
       "dialog": ["这里是大礼堂","是学校或者书院开展重要活动、讲座和课程的地方"]
     },
     {
-      "name": "化学楼",
+      "name": "科技馆",
       "rects": [[35,5,4,4]],
-      "inside_bg": "",
-      "inside_night_bg": "",
-      "dialog": ["这里是化学楼"]
+      "inside_bg": "assets/images/tech_daytime.png",
+      "inside_night_bg": "assets/images/tech_nighttime.png",
+      "dialog": ["这里是科技馆","这里的报告厅时常举行一些重要的学术报告"]
     },
     {
-      "name": "地学楼",
+      "name": "物理楼",
       "rects": [[1,15,4,4]],
-      "inside_bg": "",
-      "inside_night_bg": "",
-      "dialog": ["这里是地学楼"]
+      "inside_bg": "assets/images/physics_daytime.png",
+      "inside_night_bg": "assets/images/physics_nighttime.png",
+      "dialog": ["这里是物理楼"]
     },
     {
       "name": "图书馆",
@@ -121,29 +121,29 @@
     {
       "name": "南园14舍",
       "rects": [[12,23,5,2]],
-      "inside_bg": "",
-      "inside_night_bg": "",
+      "inside_bg": "assets/images/dorm_daytime.png",
+      "inside_night_bg": "assets/images/dorm_nighttime.png",
       "dialog": ["这里是南园14舍"]
     },
     {
       "name": "食堂",
       "rects": [[12,27,4,3]],
-      "inside_bg": "",
-      "inside_night_bg": "",
+      "inside_bg": "assets/images/canteen_daytime.png",
+      "inside_night_bg": "assets/images/canteen_nighttime.png",
       "dialog":["这里是美食的殿堂！食堂！","骗你的，好难吃www"]
     },
     {
       "name": "南园1舍",
       "rects": [[22,23,4,2]],
-      "inside_bg": "",
-      "inside_night_bg": "",
+      "inside_bg": "assets/images/dorm_daytime.png",
+      "inside_night_bg": "assets/images/dorm_nighttime.png",
       "dialog": ["这里是南园1舍"]
     },
     {
       "name": "南园2舍",
       "rects": [[23,27,4,2]],
-      "inside_bg": "",
-      "inside_night_bg": "",
+      "inside_bg": "assets/images/dorm_daytime.png",
+      "inside_night_bg": "assets/images/dorm_nighttime.png",
       "dialog": ["这里是南园2舍"]
     },
     {
@@ -156,15 +156,15 @@
     {
       "name": "南园3舍",
       "rects": [[34,23,4,2]],
-      "inside_bg": "",
-      "inside_night_bg": "",
+      "inside_bg": "assets/images/dorm_daytime.png",
+      "inside_night_bg": "assets/images/dorm_nighttime.png",
       "dialog": ["这里是南园3舍"]
     },
     {
       "name": "南园4舍",
       "rects": [[35,25,3,2]],
-      "inside_bg": "",
-      "inside_night_bg": "",
+      "inside_bg": "assets/images/dorm_daytime.png",
+      "inside_night_bg": "assets/images/dorm_nighttime.png",
       "dialog": ["这里是南园4舍"]
     },
     {
