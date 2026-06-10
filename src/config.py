@@ -31,3 +31,20 @@ class Scene:
 #字体路径
 font1_path = "assets/fonts/NotoSerifSC-VariableFont_wght.ttf" #思源宋体，适合标题
 font2_path ="assets/fonts/NotoSansSC-VariableFont_wght.ttf" #思源黑体，适合对话和UI
+
+import os
+
+AUTO_SAVE_ENABLED = True   # 默认开启
+
+def load_auto_save_setting():
+    global AUTO_SAVE_ENABLED
+    try:
+        with open("auto_save.cfg", "r") as f:
+            val = f.read().strip()
+            AUTO_SAVE_ENABLED = (val == "True")
+    except FileNotFoundError:
+        pass
+
+def save_auto_save_setting():
+    with open("auto_save.cfg", "w") as f:
+        f.write(str(AUTO_SAVE_ENABLED))

@@ -9,7 +9,7 @@ from src.building_scene import BuildingScene
 from src.save_manager import SaveManager
 from src.game_menu import GameMenu
 from src.time_system import TimeSystem
-
+import src.config as cfg
 
 class SceneManager:
     def __init__(self):
@@ -28,7 +28,7 @@ class SceneManager:
             Scene.OVERWORLD: Overworld(),
             Scene.BUILDING: BuildingScene()
         }
-        
+        self.pre_scene = None
 
     def switch_to(self, scene_name):
         if scene_name in self.scenes:
@@ -65,24 +65,56 @@ class SceneManager:
         action = self.menu.update(events)
         if action == "continue":
             self.menu_open = False
-        elif action == "saves":
-            self.save_current_game()
+        elif action == "save":
             self.menu_open = False
+            self.pre_scene = self.current_scene
+            self.scenes[Scene.SAVE_SELECT].set_mode("save", cfg.AUTO_SAVE_ENABLED)
+            self.scenes[Scene.SAVE_SELECT].refresh()
+            self.switch_to(Scene.SAVE_SELECT)
+        elif action == "load":
+            self.menu_open = False
+            self.pre_scene = self.current_scene
+            self.scenes[Scene.SAVE_SELECT].set_mode("load", cfg.AUTO_SAVE_ENABLED)
             self.scenes[Scene.SAVE_SELECT].refresh()
             self.switch_to(Scene.SAVE_SELECT)
         elif action == "exit":
-            self.save_current_game()
+            if cfg.AUTO_SAVE_ENABLED:
+                self.save_current_game()
             return "quit"
         return None
 
     def handle_action(self, action):
-        name, slot = action
+        # 兼容不同长度的元组
+        if len(action) == 2:
+            name, slot = action
+        else:
+            name = action[0]
+            slot = None
+
         if name == "new_save":
             self.pending_new_slot = slot
             self.scenes[Scene.CHARACTER_CREATE].reset()
             self.switch_to(Scene.CHARACTER_CREATE)
         elif name == "load_save":
             self.load_game(slot)
+            self.menu_open = False  # 读档后关闭菜单，进入游戏
+            # 不再停留在存档界面，无需返回键介入
+        elif name == "save_game":
+            self.current_slot = slot
+            self.save_current_game()
+            self.scenes[Scene.SAVE_SELECT].refresh()
+        elif name == "back_to_menu":
+            if self.pre_scene is not None:
+                # 回到进入存档界面前的场景（大地图或建筑内部）
+                self.switch_to(self.pre_scene)
+                # 重新打开菜单
+                self.menu.open()
+                self.menu_open = True
+                self.pre_scene = None
+            else:
+                # 从开始画面进入的读档界面 → 返回开始画面
+                self.switch_to(Scene.START)
+                self.menu_open = False
         return None
 
     def handle_scene_change(self, next_scene):
@@ -97,7 +129,8 @@ class SceneManager:
                 # 重置时间系统到默认值（新游戏开始）
                 self.time_system = TimeSystem()  # ← 新增这一行
                 self.scenes[Scene.OVERWORLD].enter(self.player_data, self.time_system)
-                self.save_current_game()
+                if cfg.AUTO_SAVE_ENABLED:
+                    self.save_current_game()
             else:
                 self.scenes[Scene.OVERWORLD].enter(self.player_data, self.time_system)
 
@@ -144,8 +177,10 @@ class SceneManager:
         self.time_system.hour = saved_time.get("hour", 8)
         self.time_system.minute = saved_time.get("minute", 0)
 
+        # 初始化大地图玩家数据
         self.scenes[Scene.OVERWORLD].enter(self.player_data, self.time_system)
 
+        # 根据存档直接跳转到目标场景
         if save_data.get("scene") == Scene.BUILDING and save_data.get("current_building"):
             building = self.find_building(save_data.get("current_building"))
             if building:
@@ -153,6 +188,8 @@ class SceneManager:
                 self.scenes[Scene.BUILDING].enter(building, is_night, self.time_system)
                 self.switch_to(Scene.BUILDING)
                 return
+
+        # 默认进入大地图
         self.switch_to(Scene.OVERWORLD)
 
     def find_building(self, building_name):
@@ -164,4 +201,4 @@ class SceneManager:
     def draw(self, screen):
         self.scenes[self.current_scene].draw(screen)
         if self.menu_open:
-            self.menu.draw(screen, self.player_data, self.current_slot)
+            self.menu.draw(screen, self.player_data, self.current_slot,self.time_system)
