@@ -9,6 +9,7 @@ from src.building_scene import BuildingScene
 from src.save_manager import SaveManager
 from src.game_menu import GameMenu
 from src.time_system import TimeSystem
+from src.music_manager import MusicManager
 
 
 class SceneManager:
@@ -28,6 +29,11 @@ class SceneManager:
             Scene.OVERWORLD: Overworld(),
             Scene.BUILDING: BuildingScene()
         }
+        self.music_manager = MusicManager()
+
+        self.music_manager.play(
+            "assets/sounds/blithemix.ogg"
+        )
         
 
     def switch_to(self, scene_name):
@@ -96,11 +102,18 @@ class SceneManager:
                 self.pending_new_slot = None
                 # 重置时间系统到默认值（新游戏开始）
                 self.time_system = TimeSystem()  # ← 新增这一行
-                self.scenes[Scene.OVERWORLD].enter(self.player_data, self.time_system)
+                self.scenes[Scene.OVERWORLD].enter(
+                    self.player_data,
+                    self.time_system,
+                    self.music_manager
+                )
                 self.save_current_game()
             else:
-                self.scenes[Scene.OVERWORLD].enter(self.player_data, self.time_system)
-
+                self.scenes[Scene.OVERWORLD].enter(
+                    self.player_data,
+                    self.time_system,
+                    self.music_manager
+                )
         if next_scene == Scene.BUILDING and self.current_scene == Scene.OVERWORLD:
             nearby = self.scenes[Scene.OVERWORLD].nearby_building
             if nearby:
@@ -144,7 +157,11 @@ class SceneManager:
         self.time_system.hour = saved_time.get("hour", 8)
         self.time_system.minute = saved_time.get("minute", 0)
 
-        self.scenes[Scene.OVERWORLD].enter(self.player_data, self.time_system)
+        self.scenes[Scene.OVERWORLD].enter(
+            self.player_data,
+            self.time_system,
+            self.music_manager
+        )
 
         if save_data.get("scene") == Scene.BUILDING and save_data.get("current_building"):
             building = self.find_building(save_data.get("current_building"))
