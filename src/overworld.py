@@ -19,23 +19,7 @@ class Overworld:
         self.time_system = None
         self.map_day = pygame.image.load("assets/images/overworld.png").convert()
         ##self.map_night = pygame.image.load("assets/images/overworld_night.png").convert()
-        self.sun_icon = pygame.image.load(
-            "assets/images/sun_icon.png"
-        ).convert_alpha()
 
-        self.moon_icon = pygame.image.load(
-            "assets/images/moon_icon.png"
-        ).convert_alpha()
-
-        self.sun_icon = pygame.transform.scale(
-            self.sun_icon,
-            (36, 36)
-        )
-
-        self.moon_icon = pygame.transform.scale(
-            self.moon_icon,
-            (36, 36)
-        )
 
     def enter(self, player_data=None, time_system=None):
         self.player_data = player_data
@@ -100,7 +84,8 @@ class Overworld:
             prompt = ""
         draw_prompt(screen, prompt)
         self.draw_menu_hint(screen)
-        self.draw_time_ui(screen)
+        from src.ui import draw_time_ui  # 如果顶部还没导入，加上
+        draw_time_ui(screen, self.time_system)
 
     def draw_menu_hint(self, screen):
         text_surf = get_ui_font(16).render("按 ESC 打开菜单", True, (60, 60, 60))
@@ -109,47 +94,3 @@ class Overworld:
         y = screen.get_height() - text_surf.get_height() - padding
         screen.blit(text_surf, (x, y))
 
-    def draw_time_ui(self, screen):
-        if not self.time_system:
-            return
-
-        time_text = self.time_system.get_time_string()
-        font = get_ui_font(20)
-        if self.time_system.is_night():
-            state_text = "夜晚"
-            icon_surface = self.moon_icon
-        else:
-            state_text = "白天"
-            icon_surface = self.sun_icon
-
-        text_surf = font.render(
-            f"{time_text}  {state_text}",
-            True,
-            (255,255,255)
-        )
-        padding = 10
-        box_padding_y = 8
-        icon_size = 36
-        gap = 12
-
-        box_width = text_surf.get_width() + icon_size + gap + 32
-        box_height = max(icon_size, text_surf.get_height()) + box_padding_y * 2
-
-        box_x = screen.get_width() - box_width - padding
-        box_y = padding
-
-        box_rect = pygame.Rect(box_x, box_y, box_width, box_height)
-
-        pygame.draw.rect(screen, (24, 28, 42), box_rect)
-        pygame.draw.rect(screen, (245, 230, 160), box_rect, 2)
-
-        inner_rect = box_rect.inflate(-6, -6)
-        pygame.draw.rect(screen, (80, 88, 120), inner_rect, 1)
-
-        icon_x = box_x + 16
-        icon_y = box_y + (box_height - icon_size) // 2
-        screen.blit(icon_surface, (icon_x, icon_y))
-
-        text_x = icon_x + icon_size + gap
-        text_y = box_y + (box_height - text_surf.get_height()) // 2
-        screen.blit(text_surf, (text_x, text_y))

@@ -1,5 +1,6 @@
 import pygame
 from src.config import font2_path
+import os
 
 _font_cache = {}
 
@@ -50,5 +51,76 @@ def draw_dialog_box(screen, text):
 
     # 文字（左对齐，垂直居中）
     text_x = box_x + padding
+    text_y = box_y + (box_height - text_surf.get_height()) // 2
+    screen.blit(text_surf, (text_x, text_y))
+
+# 日月图标缓存
+_sun_icon = None
+_moon_icon = None
+
+def _load_time_icons():
+    global _sun_icon, _moon_icon
+    if _sun_icon is None:
+        sun_path = os.path.join("assets", "images", "sun_icon.png")
+        moon_path = os.path.join("assets", "images", "moon_icon.png")
+        if os.path.exists(sun_path):
+            _sun_icon = pygame.image.load(sun_path).convert_alpha()
+            _sun_icon = pygame.transform.scale(_sun_icon, (36, 36))
+        if os.path.exists(moon_path):
+            _moon_icon = pygame.image.load(moon_path).convert_alpha()
+            _moon_icon = pygame.transform.scale(_moon_icon, (36, 36))
+
+def draw_time_ui(screen, time_system):
+    if not time_system:
+        return
+    _load_time_icons()
+
+    # 获取时间信息
+    time_str = time_system.get_time_string()          # "08:30"
+    day_str = f"第{time_system.day}天"
+    week_str = time_system.get_weekday()
+
+    # 组合显示文本：时间 | 天数 | 星期
+    display_text = f"{time_str}  {day_str}  {week_str}"
+
+    if time_system.is_night():
+        state_text = "夜晚"
+        icon_surface = _moon_icon
+    else:
+        state_text = "白天"
+        icon_surface = _sun_icon
+
+    font = get_ui_font(20)
+    text_surf = font.render(display_text, True, (255, 255, 255))
+
+    # 布局参数
+    padding = 10
+    box_padding_y = 8
+    icon_size = 36
+    gap = 12
+
+    box_width = text_surf.get_width() + icon_size + gap + 32
+    box_height = max(icon_size, text_surf.get_height()) + box_padding_y * 2
+
+    # 右上角定位
+    box_x = screen.get_width() - box_width - padding
+    box_y = padding
+
+    box_rect = pygame.Rect(box_x, box_y, box_width, box_height)
+    pygame.draw.rect(screen, (24, 28, 42), box_rect)
+    pygame.draw.rect(screen, (245, 230, 160), box_rect, 2)
+
+    # 内框装饰
+    inner_rect = box_rect.inflate(-6, -6)
+    pygame.draw.rect(screen, (80, 88, 120), inner_rect, 1)
+
+    # 图标
+    if icon_surface:
+        icon_x = box_x + 16
+        icon_y = box_y + (box_height - icon_size) // 2
+        screen.blit(icon_surface, (icon_x, icon_y))
+
+    # 文字
+    text_x = icon_x + icon_size + gap
     text_y = box_y + (box_height - text_surf.get_height()) // 2
     screen.blit(text_surf, (text_x, text_y))

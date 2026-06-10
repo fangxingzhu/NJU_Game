@@ -37,8 +37,8 @@
     {
       "name": "苏浙运动场",
       "rects": [[2,2,4,1],[1,3,6,9],[2,12,4,1]],
-      "inside_bg": "",
-      "inside_night_bg": "",
+      "inside_bg": "assets/images/playground_daytime.png",
+      "inside_night_bg": "assets/images/playground_nighttime.png",
       "dialog": ["好多人在运动呀！","今天要做什么运动呢？"]
     },
     {

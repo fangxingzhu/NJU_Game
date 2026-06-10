@@ -104,8 +104,8 @@ class SceneManager:
         if next_scene == Scene.BUILDING and self.current_scene == Scene.OVERWORLD:
             nearby = self.scenes[Scene.OVERWORLD].nearby_building
             if nearby:
-                is_night = self.time_system.is_night()  # 获取当前日夜状态
-                self.scenes[Scene.BUILDING].enter(nearby, is_night)
+                is_night = self.time_system.is_night()
+                self.scenes[Scene.BUILDING].enter(nearby, is_night, self.time_system)
 
         self.switch_to(next_scene)
 
@@ -150,7 +150,7 @@ class SceneManager:
             building = self.find_building(save_data.get("current_building"))
             if building:
                 is_night = self.time_system.is_night()
-                self.scenes[Scene.BUILDING].enter(building, is_night)
+                self.scenes[Scene.BUILDING].enter(building, is_night, self.time_system)
                 self.switch_to(Scene.BUILDING)
                 return
         self.switch_to(Scene.OVERWORLD)

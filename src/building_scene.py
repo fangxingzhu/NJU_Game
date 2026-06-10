@@ -1,5 +1,7 @@
 import os
 import pygame
+
+from src import time_system
 from src.config import Scene, font1_path, font2_path
 from src.dialog import DialogEngine
 from src.ui import draw_dialog_box
@@ -8,22 +10,31 @@ class BuildingScene:
     def __init__(self):
         self.building_data = None
         self.dialog_engine = None
-        self.is_night = False          # 新增：记录当前是否夜晚
+        self.is_night = False# 新增：记录当前是否夜晚
+        self.time_system = None
 
-    def enter(self, building_data, is_night=False):   # 新增 is_night 参数
+    def enter(self, building_data, is_night=False, time_system=None):   # 新增 is_night 参数
         self.building_data = building_data
         self.is_night = is_night
+        self.time_system = time_system
         dialog_content = building_data.get('dialog', '欢迎光临。')
         self.dialog_engine = DialogEngine(dialog_content)
 
     def update(self, events):
+        # 实时同步时间状态
+        if self.time_system:
+            self.is_night = self.time_system.is_night()
+
         for event in events:
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_q:  # 改为 Q 键退出
+                if event.key == pygame.K_q:  # Q 键退出
                     return Scene.OVERWORLD
                 if event.key == pygame.K_SPACE or event.key == pygame.K_e:
                     if self.dialog_engine and not self.dialog_engine.is_finished():
                         self.dialog_engine.next()
+                        if self.dialog_engine.is_finished():
+                            # 对话结束后不再自动退出，停留在内部
+                            pass
         return None
 
 
@@ -81,6 +92,8 @@ class BuildingScene:
         tip_bg_rect = pygame.Rect(0, 0, tip_bg_width, tip_bg_height)
         tip_bg_rect.bottomright = (screen.get_width() - 20, screen.get_height() - 20)  # 右下角
 
+        from src.ui import draw_time_ui  # 如果顶部还没导入
+        draw_time_ui(screen, self.time_system)
         # 半透明背景
         tip_bg = pygame.Surface((tip_bg_width, tip_bg_height), pygame.SRCALPHA)
         tip_bg.fill((0, 0, 0, 160))

@@ -32,3 +32,13 @@ class TimeSystem:
 
     def is_daytime(self):
         return not self.is_night()
+
+    def is_night_daytime(self):
+        return self.is_night() and self.is_daytime()
+
+    # 新增：获取星期文字
+    def get_weekday(self):
+        weekdays = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"]
+        # day 从 1 开始，1 -> 星期一
+        index = (self.day - 1) % 7
+        return weekdays[index]
