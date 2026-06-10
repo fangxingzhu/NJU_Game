@@ -17,13 +17,15 @@ class Overworld:
         self.building_manager = BuildingManager(self.map)
         self.nearby_building = None
         self.time_system = None
+        self.music_manager = None
         self.map_day = pygame.image.load("assets/images/overworld.png").convert()
         ##self.map_night = pygame.image.load("assets/images/overworld_night.png").convert()
 
 
-    def enter(self, player_data=None, time_system=None):
+    def enter(self, player_data=None, time_system=None, music_manager=None):
         self.player_data = player_data
         self.time_system = time_system
+        self.music_manager = music_manager
 
         if player_data:
             self.player.x = player_data.x
@@ -51,6 +53,23 @@ class Overworld:
         player_rect = pygame.Rect(self.player.x, self.player.y,
                                   self.player.width, self.player.height)
         self.nearby_building = self.building_manager.check_nearby(player_rect)
+
+        #音乐
+        for event in events:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+
+                mouse_pos = pygame.mouse.get_pos()
+
+                music_rect = pygame.Rect(
+                    10,
+                    10,
+                    40,
+                    40
+                )
+
+                if music_rect.collidepoint(mouse_pos):
+                    if self.music_manager:
+                        self.music_manager.toggle()
 
         # 处理事件（切换场景）
         for event in events:
@@ -86,6 +105,7 @@ class Overworld:
         self.draw_menu_hint(screen)
         from src.ui import draw_time_ui  # 如果顶部还没导入，加上
         draw_time_ui(screen, self.time_system)
+        self.draw_music_button(screen)
 
     def draw_menu_hint(self, screen):
         text_surf = get_ui_font(16).render("按 ESC 打开菜单", True, (60, 60, 60))
@@ -93,4 +113,45 @@ class Overworld:
         x = screen.get_width() - text_surf.get_width() - padding
         y = screen.get_height() - text_surf.get_height() - padding
         screen.blit(text_surf, (x, y))
+
+    def draw_music_button(self, screen):
+        if not self.music_manager:
+            return
+        font = get_ui_font(24)
+
+        icon = "♪"
+        if not self.music_manager.is_enabled():
+            icon = "×"
+
+        button_rect = pygame.Rect(
+            10,
+            10,
+            40,
+            40
+        )
+
+        pygame.draw.rect(
+            screen,
+            (88, 58, 120),
+            button_rect,
+            border_radius=8
+        )
+
+        pygame.draw.rect(
+            screen,
+            (245,230,160),
+            button_rect,
+            2,
+            border_radius=8
+        )
+
+        text = font.render(icon, True, (255,255,255))
+
+        screen.blit(
+            text,
+            (
+                button_rect.centerx - text.get_width()//2,
+                button_rect.centery - text.get_height()//2
+            )
+        )
 
