@@ -157,16 +157,54 @@ class CharacterCreationScene:
         self.draw_form(screen)
 
     def draw_portrait_background(self, screen):
+        # 背景色（男女不同）
         if self.gender == "男":
             bg_color = (40, 84, 104)
-            portrait_color = (92, 178, 196)
+            portrait_file = "boy_portrait256.png"
+            border_color = (92, 178, 196)  # 边框颜色
         else:
             bg_color = (104, 58, 92)
-            portrait_color = (214, 136, 180)
+            portrait_file = "girl_portrait256.png"
+            border_color = (214, 136, 180)
 
         screen.fill(bg_color)
-        pygame.draw.rect(screen, portrait_color, (70, 92, 260, 420))
-        pygame.draw.circle(screen, (235, 220, 208), (200, 155), 58)
+
+        # 绘制立绘图片（如果存在）
+        portrait_path = os.path.join("assets", "images", portrait_file)
+        portrait_drawn = False
+        if os.path.exists(portrait_path):
+            try:
+                portrait_img = pygame.image.load(portrait_path).convert_alpha()
+                img_width, img_height = portrait_img.get_size()  # 256x256
+
+                # 图片大小保持不变（256x256），直接放在矩形区域中央
+                # 原先矩形区域是 (70, 92, 260, 420)
+                portrait_x = 70 + (260 - img_width) // 2
+                portrait_y = 92 + (420 - img_height) // 2
+
+                # 先画一个半透明背景板（可选，让立绘更突出）
+                bg_plate = pygame.Surface((img_width + 16, img_height + 16), pygame.SRCALPHA)
+                bg_plate.fill((0, 0, 0, 100))  # 半透明黑
+                screen.blit(bg_plate, (portrait_x - 8, portrait_y - 8))
+
+                # 画立绘
+                screen.blit(portrait_img, (portrait_x, portrait_y))
+                portrait_drawn = True
+
+                # 画矩形边框（紧贴立绘，稍留间距）
+                border_rect = pygame.Rect(portrait_x - 4, portrait_y - 4,
+                                          img_width + 8, img_height + 8)
+                pygame.draw.rect(screen, border_color, border_rect, 3)
+
+            except pygame.error:
+                pass
+
+        # 如果图片加载失败，显示占位矩形（保留原逻辑）
+        if not portrait_drawn:
+            placeholder_color = border_color
+            pygame.draw.rect(screen, placeholder_color, (70, 92, 260, 420))
+
+        # 外边框（整个屏幕的装饰框，保留）
         pygame.draw.rect(screen, (24, 24, 30), (0, 0, screen.get_width(), screen.get_height()), 8)
 
     def draw_form(self, screen):

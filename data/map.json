@@ -46,7 +46,7 @@
       "rects": [[9,1,2,4]],
       "inside_bg": "assets/images/gym_daytime.png",
       "inside_night_bg": "assets/images/gym_nighttime.png",
-      "dialog": ["好像还在维修，貌似2026年下半年才能开..."]
+      "dialog": ["好像还在维修，貌似2026年下半年才能开...","到时候再来看看吧..."]
     },
     {
       "name": "教学楼",
