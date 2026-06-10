@@ -19,7 +19,7 @@ class GameMap:
     def is_walkable(self, col, row):
         return self.get_tile(col, row) != 1
 
-    def draw(self, screen, camera_x, camera_y):
+    ###def draw(self, screen, camera_x, camera_y):
         """绘制整张地图"""
         for row in range(MAP_ROWS):
             for col in range(MAP_COLS):
@@ -32,4 +32,4 @@ class GameMap:
                     color = COLOR_BUILDING
                 else:
                     color = (0, 0, 0)  # 未定义用黑色
-                pygame.draw.rect(screen, color, (x, y, TILE_SIZE, TILE_SIZE))
+                pygame.draw.rect(screen, color, (x, y, TILE_SIZE, TILE_SIZE))###

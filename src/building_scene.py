@@ -1,3 +1,4 @@
+import os
 import pygame
 from src.config import Scene, font1_path, font2_path
 from src.dialog import DialogEngine
@@ -7,40 +8,85 @@ class BuildingScene:
     def __init__(self):
         self.building_data = None
         self.dialog_engine = None
+        self.is_night = False          # 新增：记录当前是否夜晚
 
-    def enter(self, building_data):
+    def enter(self, building_data, is_night=False):   # 新增 is_night 参数
         self.building_data = building_data
-        # 从建筑数据中获取对话内容，创建对话引擎
+        self.is_night = is_night
         dialog_content = building_data.get('dialog', '欢迎光临。')
         self.dialog_engine = DialogEngine(dialog_content)
 
     def update(self, events):
         for event in events:
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+                if event.key == pygame.K_q:  # 改为 Q 键退出
                     return Scene.OVERWORLD
                 if event.key == pygame.K_SPACE or event.key == pygame.K_e:
                     if self.dialog_engine and not self.dialog_engine.is_finished():
                         self.dialog_engine.next()
-                        # 如果对话刚好在这一句结束，直接返回大地图
-                        if self.dialog_engine.is_finished():
-                            return Scene.OVERWORLD
         return None
 
+
     def draw(self, screen):
-        screen.fill((20, 20, 60))  # 内部背景
+        bg_drawn = False
         if self.building_data:
-            # 显示建筑名称（上方标题）
+            # 根据时间选择背景图的 key
+            if self.is_night:
+                bg_key = 'inside_night_bg'
+            else:
+                bg_key = 'inside_bg'
+
+            bg_path = self.building_data.get(bg_key, '')
+            # 如果没有夜晚图，回退到白天图
+            if not bg_path:
+                bg_path = self.building_data.get('inside_bg', '')
+
+            if bg_path and os.path.exists(bg_path):
+                try:
+                    bg_image = pygame.image.load(bg_path).convert()
+                    bg_image = pygame.transform.scale(bg_image, (screen.get_width(), screen.get_height()))
+                    screen.blit(bg_image, (0, 0))
+                    bg_drawn = True
+                except pygame.error:
+                    pass
+
+        if not bg_drawn:
+            screen.fill((20, 20, 60))   # 保底纯色背景
+
+        # 绘制建筑名称（居中）
+        if self.building_data:
             name_font = pygame.font.Font(font1_path, 36)
             name_surf = name_font.render(self.building_data['name'], True, (255,255,255))
             name_x = (screen.get_width() - name_surf.get_width()) // 2
             screen.blit(name_surf, (name_x, 100))
 
-        # 显示当前对话
+        # 绘制对话框
         if self.dialog_engine:
             msg = self.dialog_engine.get_current_message()
             if msg:
                 draw_dialog_box(screen, msg)
             else:
-                # 如果没有对话内容（初始即为空列表），显示一个默认提示
-                draw_dialog_box(screen, "这里空无一人。")
+                if self.dialog_engine.is_finished():
+                    draw_dialog_box(screen, "对话已结束，按 Q 离开")
+                else:
+                    draw_dialog_box(screen, "这里空无一人。")
+
+        # 绘制“按 Q 离开”提示（右下角，带半透明背景）
+        tip_text = "按 Q 离开建筑"
+        tip_font = pygame.font.Font(font2_path, 20)
+        tip_surf = tip_font.render(tip_text, True, (255, 255, 255))  # 白色文字
+        tip_padding = 14
+        tip_bg_width = tip_surf.get_width() + tip_padding * 2
+        tip_bg_height = tip_surf.get_height() + tip_padding
+        tip_bg_rect = pygame.Rect(0, 0, tip_bg_width, tip_bg_height)
+        tip_bg_rect.bottomright = (screen.get_width() - 20, screen.get_height() - 20)  # 右下角
+
+        # 半透明背景
+        tip_bg = pygame.Surface((tip_bg_width, tip_bg_height), pygame.SRCALPHA)
+        tip_bg.fill((0, 0, 0, 160))
+        screen.blit(tip_bg, tip_bg_rect.topleft)
+
+        # 文字居中于背景
+        tip_x = tip_bg_rect.x + tip_padding
+        tip_y = tip_bg_rect.y + (tip_bg_height - tip_surf.get_height()) // 2
+        screen.blit(tip_surf, (tip_x, tip_y))

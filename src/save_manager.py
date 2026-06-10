@@ -25,7 +25,9 @@ class SaveManager:
         with open(self.get_path(slot), "r", encoding="utf-8") as f:
             return json.load(f)
 
-    def save(self, slot, player_data, scene_name, current_building=None):
+    def save(self, slot, player_data, scene_name, current_building=None, game_time=None):
+        if game_time is None:
+            game_time = {"day": 1, "hour": 8, "minute": 0}
         data = {
             "version": 1,
             "slot": slot,
@@ -33,11 +35,7 @@ class SaveManager:
             "scene": scene_name,
             "current_building": current_building,
             "player": player_data.to_dict(),
-            "game_time": {
-                "day": 1,
-                "hour": 8,
-                "minute": 0
-            },
+            "game_time": game_time,
             "dialog_progress": {}
         }
         with open(self.get_path(slot), "w", encoding="utf-8") as f:

@@ -11,12 +11,14 @@ from src.ui import draw_prompt, get_ui_font
 class Overworld:
     def __init__(self):
         self.map = GameMap("data/map.json")
-        # 玩家初始位置：道路区域，例如第1列第1行的格子左上角（32,32）
-        self.player = Player(TILE_SIZE, TILE_SIZE)
+        # 玩家初始位置：道路区域，例如第24行20列
+        self.player = Player(19*TILE_SIZE, 23*TILE_SIZE)
         self.player_data = None
         self.building_manager = BuildingManager(self.map)
         self.nearby_building = None
         self.time_system = None
+        self.map_day = pygame.image.load("assets/images/overworld.png").convert()
+        ##self.map_night = pygame.image.load("assets/images/overworld_night.png").convert()
         self.sun_icon = pygame.image.load(
             "assets/images/sun_icon.png"
         ).convert_alpha()
@@ -76,17 +78,21 @@ class Overworld:
         return None
 
     def draw(self, screen):
-        # 计算摄像机偏移，让玩家始终保持在屏幕中央
+        # 摄像机计算（保持不变）
         camera_x = self.player.x - (screen.get_width() // 2) + (self.player.width // 2)
         camera_y = self.player.y - (screen.get_height() // 2) + (self.player.height // 2)
-
-        # 限制摄像机不超出地图边界
         max_camera_x = MAP_COLS * TILE_SIZE - screen.get_width()
         max_camera_y = MAP_ROWS * TILE_SIZE - screen.get_height()
         camera_x = max(0, min(camera_x, max_camera_x))
         camera_y = max(0, min(camera_y, max_camera_y))
 
-        self.map.draw(screen, camera_x, camera_y)
+        # 绘制地图背景（替换原来的色块绘制）
+        '''if self.time_system and self.time_system.is_night():
+            screen.blit(self.map_night, (-camera_x, -camera_y))
+        else:''' #待添加
+        screen.blit(self.map_day, (-camera_x, -camera_y))
+
+        # 绘制玩家、提示、时间等（保持不变）
         self.player.draw(screen, camera_x, camera_y)
         if self.nearby_building:
             prompt = f"按 E 进入{self.nearby_building['name']}"
