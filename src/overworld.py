@@ -18,8 +18,8 @@ class Overworld:
         self.nearby_building = None
         self.time_system = None
         self.music_manager = None
-        self.map_day = pygame.image.load("assets/images/overworld.png").convert()
-        ##self.map_night = pygame.image.load("assets/images/overworld_night.png").convert()
+        self.map_day = pygame.image.load("assets/images/overworld_daytime.png").convert()
+        self.map_night = pygame.image.load("assets/images/overworld_nighttime.png").convert()
 
 
     def enter(self, player_data=None, time_system=None, music_manager=None):
@@ -82,10 +82,10 @@ class Overworld:
         camera_y = max(0, min(camera_y, max_camera_y))
 
         # 绘制地图背景（替换原来的色块绘制）
-        '''if self.time_system and self.time_system.is_night():
+        if self.time_system and self.time_system.is_night():
             screen.blit(self.map_night, (-camera_x, -camera_y))
-        else:''' #待添加
-        screen.blit(self.map_day, (-camera_x, -camera_y))
+        else:
+            screen.blit(self.map_day, (-camera_x, -camera_y))
 
         # 绘制玩家、提示、时间等（保持不变）
         self.player.draw(screen, camera_x, camera_y)

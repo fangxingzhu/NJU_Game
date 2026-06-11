@@ -114,8 +114,8 @@
     {
       "name": "南园校门",
       "rects": [[19,21,3,2]],
-      "inside_bg": "",
-      "inside_night_bg": "",
+      "inside_bg": "assets/images/Southgate_daytime.png",
+      "inside_night_bg": "assets/images/Southgate_nighttime.png",
       "dialog": ["这是平平无奇的南园校门"]
     },
     {
@@ -149,8 +149,8 @@
     {
       "name": "南园超市",
       "rects": [[29,23,3,4]],
-      "inside_bg": "",
-      "inside_night_bg": "",
+      "inside_bg": "assets/images/store_daytime.png",
+      "inside_night_bg": "assets/images/store_daytime.png",
       "dialog": ["哇塞是南园超市","快来整点好吃的吧！"]
     },
     {
@@ -168,11 +168,11 @@
       "dialog": ["这里是南园4舍"]
     },
     {
-      "name": "南园浴室",
+      "name": "南园后勤服务中心",
       "rects": [[34,29,4,2]],
       "inside_bg": "",
       "inside_night_bg": "",
-      "dialog": ["这里是南园浴室","虽然南园绝大多数宿舍都有了独立卫浴","但是公共澡堂还是保留了下来","快来洗一个香喷喷的澡吧"]
+      "dialog": ["这里是南大后勤服务中心推出的快餐车","可以在这方便地买一日三餐呢","在社交媒体上@南大后勤，可以很快的得到反馈呢"]
     }
     ]
 }
