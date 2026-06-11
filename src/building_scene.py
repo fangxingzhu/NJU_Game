@@ -332,7 +332,7 @@ class BuildingScene:
         tip_bg_width = tip_surf.get_width() + tip_padding * 2
         tip_bg_height = tip_surf.get_height() + tip_padding
         tip_bg_rect = pygame.Rect(0, 0, tip_bg_width, tip_bg_height)
-        tip_bg_rect.bottomright = (screen.get_width() - 20, screen.get_height() - 20)
+        tip_bg_rect.topright = (screen.get_width() - 20, 20)
         tip_bg = pygame.Surface((tip_bg_width, tip_bg_height), pygame.SRCALPHA)
         tip_bg.fill((0, 0, 0, 160))
         screen.blit(tip_bg, tip_bg_rect.topleft)
