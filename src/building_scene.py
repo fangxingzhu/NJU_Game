@@ -2,7 +2,6 @@ import os
 import pygame
 import random
 
-from src import time_system
 from src.config import Scene, font1_path, font2_path
 from src.dialog import DialogEngine
 from src.ui import draw_dialog_box
