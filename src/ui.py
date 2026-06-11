@@ -30,14 +30,34 @@ def draw_prompt(screen, text):
     text_y = bg_rect.y + padding // 2
     screen.blit(text_surf, (text_x, text_y))
 
+def wrap_text(text, font, max_width):
+    lines = []
+    for raw_line in str(text).split("\n"):
+        current = ""
+        for char in raw_line:
+            test_line = current + char
+            if current and font.size(test_line)[0] > max_width:
+                lines.append(current)
+                current = char
+            else:
+                current = test_line
+        lines.append(current)
+    return lines
+
 def draw_dialog_box(screen, text):
     if not text:
         return
     font = get_ui_font(24)
-    text_surf = font.render(text, True, (255, 255, 255))
     padding = 20
     box_width = screen.get_width() - 100
-    box_height = 80
+    max_text_width = box_width - padding * 2
+    line_surfs = [
+        font.render(line, True, (255, 255, 255))
+        for line in wrap_text(text, font, max_text_width)
+    ]
+    line_gap = 6
+    text_height = sum(surf.get_height() for surf in line_surfs) + line_gap * max(0, len(line_surfs) - 1)
+    box_height = max(80, text_height + padding)
     box_x = 50
     box_y = screen.get_height() - box_height - 30
 
@@ -51,8 +71,10 @@ def draw_dialog_box(screen, text):
 
     # 文字（左对齐，垂直居中）
     text_x = box_x + padding
-    text_y = box_y + (box_height - text_surf.get_height()) // 2
-    screen.blit(text_surf, (text_x, text_y))
+    text_y = box_y + (box_height - text_height) // 2
+    for surf in line_surfs:
+        screen.blit(surf, (text_x, text_y))
+        text_y += surf.get_height() + line_gap
 
 # 日月图标缓存
 _sun_icon = None
