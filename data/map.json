@@ -106,14 +106,14 @@
     },
     {
       "name": "汉口路校门",
-      "rects": [[19,18,3,2]],
+      "rects": [[18,18,3,2]],
       "inside_bg": "assets/images/gate_daytime.png",
       "inside_night_bg": "assets/images/gate_nighttime.png",
       "dialog": ["这里是汉口路校门，南大的地标之一"]
     },
     {
       "name": "南园校门",
-      "rects": [[19,21,3,2]],
+      "rects": [[18,21,3,2]],
       "inside_bg": "assets/images/Southgate_daytime.png",
       "inside_night_bg": "assets/images/Southgate_nighttime.png",
       "dialog": ["这是平平无奇的南园校门"]
