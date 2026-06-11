@@ -26,6 +26,7 @@ class BuildingScene:
         self.quiz_index = 0
         self.quiz_questions = []
         self.quiz_feedback = None
+        self.quiz_correct_count = 0  # 答对题数
         self.background_cache = {}
         self.portrait_cache = {}
         self.name_font = pygame.font.Font(font1_path, 36)
@@ -78,6 +79,7 @@ class BuildingScene:
         self.quiz_index = 0
         self.quiz_questions = []
         self.quiz_feedback = None
+        self.quiz_correct_count = 0
 
         # 根据建筑配置决定进入哪种模式
         if building_data.get("dialog_mode") == "quiz":
@@ -170,10 +172,18 @@ class BuildingScene:
 
                 if event.key == pygame.K_SPACE or event.key == pygame.K_e:
                     if self.mode == "quiz_result":
-                        if self.quiz_index < len(self.quiz_questions):
-                            self.start_quiz_question()
+                        if event.key == pygame.K_SPACE or event.key == pygame.K_e:
+                            if self.quiz_index < len(self.quiz_questions):
+                                # 还有下一题，继续
+                                self.start_quiz_question()
+                            else:
+                                # 所有题目已答完，进入总结界面
+                                self.mode = "quiz_summary"
                             return None
-                        return Scene.OVERWORLD
+
+                    if self.mode == "quiz_summary":
+                        if event.key == pygame.K_SPACE or event.key == pygame.K_e:
+                            return Scene.OVERWORLD
 
                     # 不同模式下的对话推进逻辑
                     if self.mode == "intro":
@@ -236,6 +246,7 @@ class BuildingScene:
         answer_index = self.current_dialog_case.get("answer", 0)
         if selected_index == answer_index:
             self.quiz_feedback = self.current_dialog_case.get("correct_reply", "回答正确！")
+            self.quiz_correct_count += 1  # 新增这一行
         else:
             self.quiz_feedback = self.current_dialog_case.get("wrong_reply", "回答错误，再接再厉。")
         self.mode = "quiz_result"
@@ -303,6 +314,8 @@ class BuildingScene:
                 screen.blit(player_img, (screen.get_width() - 220, screen.get_height() - 270))
 
         # 绘制选择界面
+        if self.mode == "quiz_summary":
+            self.draw_quiz_summary(screen)
         if self.mode == "quiz_intro":
             self.draw_quiz_intro_ui(screen)
         if self.mode == "quiz_question":
@@ -339,6 +352,8 @@ class BuildingScene:
         tip_x = tip_bg_rect.x + tip_padding
         tip_y = tip_bg_rect.y + (tip_bg_height - tip_surf.get_height()) // 2
         screen.blit(tip_surf, (tip_x, tip_y))
+
+
 
     def draw_quiz_intro_ui(self, screen):
         panel_width = 420
@@ -431,3 +446,60 @@ class BuildingScene:
         pygame.draw.rect(screen, border_color, rect, 2)
         text_surf = self.choice_font.render(text, True, (255, 255, 255))
         screen.blit(text_surf, (rect.centerx - text_surf.get_width() // 2, rect.centery - text_surf.get_height() // 2))
+
+    def draw_quiz_summary(self, screen):
+        total = len(self.quiz_questions)
+        correct = self.quiz_correct_count
+
+        # 根据正确率选择评语
+        if total > 0:
+            ratio = correct / total
+            if ratio == 1.0:
+                key = "perfect"
+            elif ratio >= 0.8:
+                key = "good"
+            elif ratio >= 0.6:
+                key = "average"
+            else:
+                key = "poor"
+        else:
+            key = "poor"
+
+        default_messages = {
+            "perfect": "太棒了！全部答对，红色知识达人！",
+            "good": "很不错，答对大部分题目，继续加油。",
+            "average": "还不错，多多了解红色历史。",
+            "poor": "革命尚未成功，同志仍需努力！"
+        }
+        messages = self.building_data.get("summary_messages", default_messages)
+        remark = messages.get(key, default_messages[key])
+
+        # 绘制面板
+        panel_width = 500
+        panel_height = 240
+        panel_x = (screen.get_width() - panel_width) // 2
+        panel_y = (screen.get_height() - panel_height) // 2
+        panel_rect = pygame.Rect(panel_x, panel_y, panel_width, panel_height)
+        pygame.draw.rect(screen, (24, 28, 42), panel_rect)
+        pygame.draw.rect(screen, (245, 230, 160), panel_rect, 3)
+
+        # 标题
+        title_surf = self.name_font.render("答题结束", True, (255, 255, 255))
+        screen.blit(title_surf, (panel_rect.centerx - title_surf.get_width() // 2, panel_rect.y + 24))
+
+        # 成绩
+        score_text = f"答对 {correct} 题，共 {total} 题"
+        score_surf = self.choice_font.render(score_text, True, (255, 255, 255))
+        screen.blit(score_surf, (panel_rect.centerx - score_surf.get_width() // 2, panel_rect.y + 80))
+
+        # 评语（可能较长，使用 wrap_text 换行）
+        remark_lines = self.wrap_text(remark, self.choice_font, panel_width - 60)
+        line_y = panel_rect.y + 130
+        for line in remark_lines:
+            line_surf = self.choice_font.render(line, True, (245, 230, 160))
+            screen.blit(line_surf, (panel_rect.centerx - line_surf.get_width() // 2, line_y))
+            line_y += 30
+
+        # 提示
+        tip_surf = self.tip_font.render("按空格或 E 离开", True, (200, 200, 200))
+        screen.blit(tip_surf, (panel_rect.centerx - tip_surf.get_width() // 2, panel_rect.y + panel_height - 40))
