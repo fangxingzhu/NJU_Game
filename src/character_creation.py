@@ -19,6 +19,19 @@ class CharacterCreationScene:
         self.male_rect = pygame.Rect(0, 0, 130, 46)
         self.female_rect = pygame.Rect(0, 0, 130, 46)
         self.confirm_rect = pygame.Rect(0, 0, 220, 52)
+        self.portrait_cache = {}
+
+    def get_portrait(self, portrait_file):
+        if portrait_file not in self.portrait_cache:
+            portrait_path = os.path.join("assets", "images", portrait_file)
+            if not os.path.exists(portrait_path):
+                self.portrait_cache[portrait_file] = None
+            else:
+                try:
+                    self.portrait_cache[portrait_file] = pygame.image.load(portrait_path).convert_alpha()
+                except pygame.error:
+                    self.portrait_cache[portrait_file] = None
+        return self.portrait_cache[portrait_file]
 
     def reset(self):
         self.name = ""
@@ -170,11 +183,10 @@ class CharacterCreationScene:
         screen.fill(bg_color)
 
         # 绘制立绘图片（如果存在）
-        portrait_path = os.path.join("assets", "images", portrait_file)
+        portrait_img = self.get_portrait(portrait_file)
         portrait_drawn = False
-        if os.path.exists(portrait_path):
+        if portrait_img:
             try:
-                portrait_img = pygame.image.load(portrait_path).convert_alpha()
                 img_width, img_height = portrait_img.get_size()  # 256x256
 
                 # 图片大小保持不变（256x256），直接放在矩形区域中央
