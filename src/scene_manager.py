@@ -32,21 +32,27 @@ class SceneManager:
             Scene.BUILDING: BuildingScene(),
             Scene.MINIGAME: MinigameCrossroad()
         }
-        self.music_manager = MusicManager()
-
-        self.music_manager.play(
-            "assets/sounds/blithemix.ogg"
-        )
 
         self.pre_scene = None
         # 用于记录进入小游戏前的玩家坐标
         self.minigame_origin_pos = None
+        # 在 __init__ 中
+        self.music_manager = MusicManager(playlist=[
+            "assets/sounds/blithemix.ogg",
+            "assets/sounds/Alls Fair In Love.mp3",  # 请替换为你的音乐文件
+            "assets/sounds/And Just Like That.mp3",
+            "assets/sounds/Barroom Ballet.mp3",
+            "assets/sounds/Funshine.mp3",
+        ])
+        self.music_manager.play()
 
     def switch_to(self, scene_name):
         if scene_name in self.scenes:
             self.current_scene = scene_name
 
     def update(self, events):
+        # 更新音乐切歌
+        self.music_manager.update()
         if self.current_scene in (Scene.OVERWORLD, Scene.BUILDING) and not self.menu_open:
             self.time_system.update()
         if self.menu_open:
