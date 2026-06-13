@@ -11,6 +11,7 @@ class PlayerData:
     y: int = 23*TILE_SIZE
     direction: str = "down"
     dormitory: str = ""
+    easter_egg_found: bool = False  # 新增：彩蛋触发状态
 
     def to_dict(self):
         return {
@@ -19,7 +20,8 @@ class PlayerData:
             "x": self.x,
             "y": self.y,
             "direction": self.direction,
-            "dormitory": self.dormitory  # 新字段
+            "dormitory": self.dormitory, # 新字段
+            "easter_egg_found": self.easter_egg_found  # 新字段
         }
 
     @classmethod
@@ -30,5 +32,6 @@ class PlayerData:
             x=data.get("x", TILE_SIZE),
             y=data.get("y", TILE_SIZE),
             direction=data.get("direction", "down"),
-            dormitory = data.get("dormitory", "")  # 新字段
+            dormitory = data.get("dormitory", ""), # 新字段
+            easter_egg_found = data.get("easter_egg_found", False)  # 读取新字段
         )
