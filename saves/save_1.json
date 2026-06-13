@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "slot": 1,
+  "saved_at": "2026-06-13T21:44:44",
+  "scene": "character_create",
+  "current_building": null,
+  "player": {
+    "name": "aaa",
+    "gender": "男",
+    "x": 608,
+    "y": 736,
+    "direction": "down",
+    "dormitory": "南园14舍"
+  },
+  "game_time": {
+    "day": 1,
+    "hour": 8,
+    "minute": 0
+  },
+  "dialog_progress": {}
+}
