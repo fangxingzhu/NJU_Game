@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "slot": 1,
+  "saved_at": "2026-06-14T16:18:58",
+  "scene": "overworld",
+  "current_building": null,
+  "player": {
+    "name": "NJU",
+    "gender": "男",
+    "x": 608,
+    "y": 640,
+    "direction": "right",
+    "dormitory": "南园1舍",
+    "easter_egg_found": false
+  },
+  "game_time": {
+    "day": 2,
+    "hour": 20,
+    "minute": 30
+  },
+  "dialog_progress": {}
+}
