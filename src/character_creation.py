@@ -71,6 +71,7 @@ class CharacterCreationScene:
                     self.gender = "女"
                 elif self.confirm_rect.collidepoint(event.pos) and self.can_confirm():
                     self.created_player_data = PlayerData(self.name.strip(), self.gender)
+                    self.created_player_data.dormitory = self.dormitories[self.dormitory_index]
                     return Scene.OVERWORLD
                 # 宿舍选择箭头
                 if self.left_arrow_rect.collidepoint(event.pos):
